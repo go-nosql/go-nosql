@@ -21,12 +21,3 @@ _testmain.go
 
 *.exe
 *.test
-bin
-pkg
-pkg/linux_amd64
-src
-src/db/entity
-src/supported_db
-src/db
-src/abstract
-
