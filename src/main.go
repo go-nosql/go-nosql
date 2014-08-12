@@ -1,12 +1,12 @@
 package main
 
 import (
-	"supported_db"
 	"entity"
-	_"fmt"
-	)
+	_ "fmt"
+	"supported_db"
+)
 
-func main(){
+func main() {
 
 	dbObj := supported_db.MongoDb{}
 	//dbObj := supported_db.CouchDb{}
@@ -18,19 +18,19 @@ func main(){
 
 	//Read
 	/*
-	var patients []entity.Patient
-	patients = dbObj.Read()
-	fmt.Println(patients)
+		var patients []entity.Patient
+		patients = dbObj.Read()
+		fmt.Println(patients)
 	*/
 
 	//Delete
 	/*
-	dbObj.Delete(patients[0])
+		dbObj.Delete(patients[0])
 	*/
 
 	//Update
 	/*
-	patients[0].PersonalDetail.FirstName = "upgraded"
-	dbObj.Update(patients[0])
+		patients[0].PersonalDetail.FirstName = "upgraded"
+		dbObj.Update(patients[0])
 	*/
 }

@@ -2,7 +2,7 @@ package abstract
 
 import "entity"
 
-type Database interface{
+type Database interface {
 	//GetConnection()
 	Save(entity.Patient) bool
 	Read() []entity.Patient
