@@ -1,36 +1,37 @@
 package main
 
 import (
-	"entity"
-	_ "fmt"
-	"supported_db"
+	"db"
+	"db/entity"
+	"fmt"
+	_ "supported_db"
 )
 
 func main() {
-
-	dbObj := supported_db.MongoDb{}
-	//dbObj := supported_db.CouchDb{}
+	couch, mongo := db.GetConnection("config.ini") //Pass configuration file location
+	fmt.Println("eeee : ", couch, "Mongo : ", mongo)
 
 	//Save
 	patient := entity.Patient{}
-	patient.PersonalDetail.FirstName = "first"
-	dbObj.Save(patient)
+	patient.PersonalDetail.FirstName = "NewName"
+	//mongo.Save(patient)
+	couch.Save(patient)
 
 	//Read
-	/*
-		var patients []entity.Patient
-		patients = dbObj.Read()
-		fmt.Println(patients)
-	*/
+
+	var patients []entity.Patient
+	//patients = mongo.Read()
+	patients = couch.Read()
+	fmt.Println(patients)
 
 	//Delete
-	/*
-		dbObj.Delete(patients[0])
-	*/
+
+	//	mongo.Delete(patients[0])
+	couch.Delete(patients[0])
 
 	//Update
-	/*
-		patients[0].PersonalDetail.FirstName = "upgraded"
-		dbObj.Update(patients[0])
-	*/
+
+	patients[1].PersonalDetail.FirstName = "upgraded"
+	//mongo.Update(patients[1])
+	couch.Update(patients[1])
 }

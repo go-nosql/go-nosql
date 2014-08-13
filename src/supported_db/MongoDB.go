@@ -1,40 +1,23 @@
 package supported_db
 
 import (
-	"configparser-master"
-	"entity"
+	"db/entity"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type MongoDb struct {
-}
-
-func (this *MongoDb) GetConnection() *mgo.Collection {
-	var collection *mgo.Collection
-	conf, err := configparser.Read("/home/gold/go/go-orm/config.ini")
-	if err != nil {
-		panic(err)
-	}
-	confg, _ := conf.Section("database")
-	mongoSession, err := mgo.Dial(confg.ValueOf("IPAddress") + ":" + confg.ValueOf("Port"))
-	if err != nil {
-		panic(err)
-	} else {
-		db := mongoSession.DB(confg.ValueOf("DbName"))
-		collection = db.C(confg.ValueOf("CollectionName"))
-	}
-	return collection
+	Conn *mgo.Collection
 }
 
 func (this *MongoDb) Read() []entity.Patient {
 	var patients []entity.Patient
-	this.GetConnection().Find(nil).All(&patients)
+	this.Conn.Find(nil).All(&patients)
 	return patients
 }
 
 func (this *MongoDb) Save(patient entity.Patient) bool {
-	err := this.GetConnection().Insert(patient)
+	err := this.Conn.Insert(patient)
 	if err == nil {
 		return true
 	} else {
@@ -43,7 +26,7 @@ func (this *MongoDb) Save(patient entity.Patient) bool {
 }
 
 func (this *MongoDb) Delete(patient entity.Patient) bool {
-	err := this.GetConnection().Remove(bson.M{"_id": bson.ObjectId(patient.Id)})
+	err := this.Conn.Remove(bson.M{"_id": bson.ObjectId(patient.Id)})
 	if err == nil {
 		return true
 	} else {
@@ -52,7 +35,7 @@ func (this *MongoDb) Delete(patient entity.Patient) bool {
 }
 
 func (this *MongoDb) Update(patient entity.Patient) bool {
-	err := this.GetConnection().UpdateId(bson.ObjectId(patient.Id), bson.M{"PersonalDetail": patient.PersonalDetail, "ContactDetail": patient.ContactDetail, "Height": patient.Height, "Weight": patient.Weight})
+	err := this.Conn.UpdateId(bson.ObjectId(patient.Id), bson.M{"PersonalDetail": patient.PersonalDetail, "ContactDetail": patient.ContactDetail, "Height": patient.Height, "Weight": patient.Weight})
 	if err == nil {
 		return true
 	} else {
