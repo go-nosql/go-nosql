@@ -8,30 +8,29 @@ import (
 )
 
 func main() {
-	couch, mongo := db.GetConnection("config.ini") //Pass configuration file location
-	fmt.Println("eeee : ", couch, "Mongo : ", mongo)
+	database := db.GetConnection("config.ini") //Pass configuration file location
 
 	//Save
 	patient := entity.Patient{}
 	patient.PersonalDetail.FirstName = "NewName"
 	//mongo.Save(patient)
-	couch.Save(patient)
+	database.Save(patient)
 
 	//Read
 
 	var patients []entity.Patient
 	//patients = mongo.Read()
-	patients = couch.Read()
+	patients = database.Read()
 	fmt.Println(patients)
 
 	//Delete
 
 	//	mongo.Delete(patients[0])
-	couch.Delete(patients[0])
+	database.Delete(patients[0])
 
 	//Update
 
-	patients[1].PersonalDetail.FirstName = "upgraded"
+	patients[1].PersonalDetail.FirstName = "updated"
 	//mongo.Update(patients[1])
-	couch.Update(patients[1])
+	database.Update(patients[1])
 }

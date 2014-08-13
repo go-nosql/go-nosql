@@ -9,7 +9,7 @@ type CouchDb struct {
 	Conn couch.Database
 }
 
-func (this *CouchDb) Save(patient entity.Patient) bool {
+func (this CouchDb) Save(patient entity.Patient) bool {
 	id, rev, err := this.Conn.Insert(patient)
 	if err == nil && id != "" && rev != "" {
 		return true
@@ -18,7 +18,7 @@ func (this *CouchDb) Save(patient entity.Patient) bool {
 	}
 }
 
-func (this *CouchDb) Read() []entity.Patient {
+func (this CouchDb) Read() []entity.Patient {
 	ids, err := this.Conn.QueryIds("_all_docs", nil)
 	patients := make([]entity.Patient, len(ids))
 	if err != nil {
@@ -34,7 +34,7 @@ func (this *CouchDb) Read() []entity.Patient {
 	return patients
 }
 
-func (this *CouchDb) Delete(patient entity.Patient) bool {
+func (this CouchDb) Delete(patient entity.Patient) bool {
 	rev, err := this.Conn.Retrieve(patient.Id, &patient)
 	if err == nil && rev != "" {
 		err = this.Conn.Delete(patient.Id, rev)
@@ -48,7 +48,7 @@ func (this *CouchDb) Delete(patient entity.Patient) bool {
 	}
 }
 
-func (this *CouchDb) Update(patient entity.Patient) bool {
+func (this CouchDb) Update(patient entity.Patient) bool {
 	var r entity.Patient
 	rev, err := this.Conn.Retrieve(patient.Id, &r)
 	if err == nil {

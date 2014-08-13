@@ -7,9 +7,10 @@ import (
 	"gopkg.in/mgo.v2"
 	"strings"
 	"supported_db"
+	"abstract"
 )
 
-func GetConnection(path string) (supported_db.CouchDb, supported_db.MongoDb) {
+func GetConnection(path string) abstract.Database {
 	var collection *mgo.Collection
 	conf, err := configparser.Read(path)
 	if err != nil {
@@ -19,7 +20,7 @@ func GetConnection(path string) (supported_db.CouchDb, supported_db.MongoDb) {
 	switch strings.ToUpper(config.ValueOf("Database")) {
 	case "COUCH":
 		db, _ := couch.NewDatabase(config.ValueOf("IPAddress"), config.ValueOf("Port"), config.ValueOf("DbName"))
-		return supported_db.CouchDb{db}, supported_db.MongoDb{}
+		return abstract.Database(supported_db.CouchDb{db})
 	case "MONGO":
 		mongoSession, err := mgo.Dial(config.ValueOf("IPAddress") + ":" + config.ValueOf("Port"))
 		if err != nil {
@@ -29,7 +30,7 @@ func GetConnection(path string) (supported_db.CouchDb, supported_db.MongoDb) {
 			collection = db.C(config.ValueOf("CollectionName"))
 			fmt.Println(collection)
 		}
-		return supported_db.CouchDb{}, supported_db.MongoDb{collection}
+		return abstract.Database(supported_db.MongoDb{collection})
 	}
-	return supported_db.CouchDb{}, supported_db.MongoDb{}
+	return nil
 }

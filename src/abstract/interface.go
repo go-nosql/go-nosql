@@ -1,10 +1,10 @@
 package abstract
 
-import "db"
+import "db/entity"
 
 type Database interface {
-	Save(db.Patient) bool
-	Read() []db.Patient
-	Update(db.Patient) bool
-	Delete(db.Patient) bool
+	Save(entity.Patient) bool
+	Read() []entity.Patient
+	Update(entity.Patient) bool
+	Delete(entity.Patient) bool
 }
