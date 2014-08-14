@@ -3,7 +3,6 @@ package db
 import (
 	"configparser-master"
 	"couch-go-master"
-	"fmt"
 	"gopkg.in/mgo.v2"
 	"strings"
 	"supported_db"
@@ -16,19 +15,29 @@ func GetConnection(path string) abstract.Database {
 	if err != nil {
 		panic(err)
 	}
-	config, _ := conf.Section("database")
-	switch strings.ToUpper(config.ValueOf("Database")) {
+	driver_config, _ := conf.Section("database")
+	db_config, _ := conf.Section(driver_config.ValueOf("name"))
+	switch strings.ToUpper(driver_config.ValueOf("name")) {
 	case "COUCH":
-		db, _ := couch.NewDatabase(config.ValueOf("IPAddress"), config.ValueOf("Port"), config.ValueOf("DbName"))
+		var db couch.Database
+		if db_config.ValueOf("user") == ""{
+			db, _ = couch.NewDatabase(db_config.ValueOf("ipaddress"), db_config.ValueOf("port"), db_config.ValueOf("dbname"))
+		} else {
+			db, _ = couch.NewDatabaseByURL("http://" + db_config.ValueOf("user") + ":" + db_config.ValueOf("password") + "@" + db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port") + "/" + db_config.ValueOf("dbname"))
+		}
 		return abstract.Database(supported_db.CouchDb{db})
 	case "MONGO":
-		mongoSession, err := mgo.Dial(config.ValueOf("IPAddress") + ":" + config.ValueOf("Port"))
+		var mongoSession *mgo.Session
+		if db_config.ValueOf("user") == "" {
+			mongoSession, err = mgo.Dial(db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port"))
+		} else {
+			mongoSession, err = mgo.Dial(db_config.ValueOf("user") + ":" + db_config.ValueOf("password") + "@" + db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port") + "/" + db_config.ValueOf("dbname"))
+		}
 		if err != nil {
 			panic(err)
 		} else {
-			db := mongoSession.DB(config.ValueOf("DbName"))
-			collection = db.C(config.ValueOf("CollectionName"))
-			fmt.Println(collection)
+			db := mongoSession.DB(db_config.ValueOf("dbname"))
+			collection = db.C(db_config.ValueOf("collectionname"))
 		}
 		return abstract.Database(supported_db.MongoDb{collection})
 	}
