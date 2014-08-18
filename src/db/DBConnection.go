@@ -16,7 +16,15 @@ func GetConnection(path string) abstract.Database {
 		panic(err)
 	}
 	driver_config, _ := conf.Section("database")
-	db_config, _ := conf.Section(driver_config.ValueOf("name"))
+	var db_config *configparser.Section
+	//to make name of the database in config file case-insensitive
+	if strings.Contains(strings.ToLower(driver_config.ValueOf("name")), "mongo") {
+		db_config, _ = conf.Section("mongo")
+		driver_config.SetValueFor("name", "mongo")
+	} else if strings.Contains(strings.ToLower(driver_config.ValueOf("name")), "couch") {
+		db_config, _ = conf.Section("couch")
+		driver_config.SetValueFor("name", "couch")
+	}
 	switch strings.ToUpper(driver_config.ValueOf("name")) {
 	case "COUCH":
 		var db couch.Database
