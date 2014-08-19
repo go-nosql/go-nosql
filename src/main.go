@@ -2,28 +2,28 @@ package main
 
 import (
 	"db"
-	"db/entity"
 	"fmt"
 )
 
 func main() {
-	database := db.GetConnection("config.ini") //Pass configuration file location
+	database,_ := db.GetConnection("config.ini") //Pass configuration file location
 
 	//Save
-	//patient := entity.Patient{}
-	//patient.PersonalDetail.FirstName = "NewName"
-	//database.Save(patient)
+	//m["name"] = "suriya"
+	//m["age"] = 24
+	//m["city"] = "Cbe"
+	//m["address"] = "India"
+	//database.Save(m)
 
 	//Read
-
-	var patients []entity.Patient
-	patients = database.Read()
-	fmt.Println(patients)
+	a := database.Read()
+	fmt.Println(a)
 
 	//Delete
-	//database.Delete(patients[0])
+	//database.Delete(a[0])
 
 	//Update
-	//patients[0].PersonalDetail.FirstName = "updated"
-	//database.Update(patients[0])
+	a[0]["city"] = "tirupur"
+	database.Update(a[0])
+
 }

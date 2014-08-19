@@ -2,15 +2,15 @@ package supported_db
 
 import (
 	"couch-go-master"
-	"db/entity"
+	"fmt"
 )
 
 type CouchDb struct {
 	Conn couch.Database
 }
 
-func (this CouchDb) Save(patient entity.Patient) bool {
-	id, rev, err := this.Conn.Insert(patient)
+func (this CouchDb) Save(record interface{}) bool {
+	id, rev, err := this.Conn.Insert(record)
 	if err == nil && id != "" && rev != "" {
 		return true
 	} else {
@@ -18,26 +18,26 @@ func (this CouchDb) Save(patient entity.Patient) bool {
 	}
 }
 
-func (this CouchDb) Read() []entity.Patient {
+func (this CouchDb) Read() []map[string]interface{} {
 	ids, err := this.Conn.QueryIds("_all_docs", nil)
-	patients := make([]entity.Patient, len(ids))
+	records := make([]map[string]interface{}, len(ids))
 	if err != nil {
 		panic(err)
 	} else {
 		for i := 0; i < len(ids); i++ {
-			_, err = this.Conn.Retrieve(ids[i], &patients[i])
+			_, err = this.Conn.Retrieve(ids[i], &records[i])
 			if err != nil {
 				panic(err)
 			}
 		}
 	}
-	return patients
+	return records
 }
 
-func (this CouchDb) Delete(patient entity.Patient) bool {
-	rev, err := this.Conn.Retrieve(patient.Id, &patient)
+func (this CouchDb) Delete(record map[string]interface{}) bool {
+	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s",record["_id"]), &record)
 	if err == nil && rev != "" {
-		err = this.Conn.Delete(patient.Id, rev)
+		err = this.Conn.Delete(fmt.Sprintf("%s",record["_id"]), rev)
 		if err == nil {
 			return true
 		} else {
@@ -48,11 +48,11 @@ func (this CouchDb) Delete(patient entity.Patient) bool {
 	}
 }
 
-func (this CouchDb) Update(patient entity.Patient) bool {
-	var r entity.Patient
-	rev, err := this.Conn.Retrieve(patient.Id, &r)
+func (this CouchDb) Update(record map[string]interface{}) bool {
+	var r map[string]interface{}
+	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s",record["_id"]), &r)
 	if err == nil {
-		rev, err = this.Conn.EditWith(patient, patient.Id, rev)
+		rev, err = this.Conn.EditWith(record, fmt.Sprintf("%s",record["_id"]), rev)
 		if err == nil {
 			return true
 		} else {

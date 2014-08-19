@@ -1,27 +1,22 @@
 package supported_db
 
 import (
-	"db/entity"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"fmt"
 )
 
 type MongoDb struct {
 	Conn *mgo.Collection
 }
 
-func (this MongoDb) Read() []entity.Patient {
-	var patients []entity.Patient
-	this.Conn.Find(nil).All(&patients)
-	for i, _ := range patients {
-		patients[i].Id = fmt.Sprintf("%x", string(patients[i].Id))
-	}
-	return patients
+func (this MongoDb) Read() []map[string]interface{} {
+	var records []map[string]interface{}
+	this.Conn.Find(nil).All(&records)
+	return records
 }
 
-func (this MongoDb) Save(patient entity.Patient) bool {
-	err := this.Conn.Insert(patient)
+func (this MongoDb) Save(record interface{}) bool {
+	err := this.Conn.Insert(record)
 	if err == nil {
 		return true
 	} else {
@@ -29,8 +24,8 @@ func (this MongoDb) Save(patient entity.Patient) bool {
 	}
 }
 
-func (this MongoDb) Delete(patient entity.Patient) bool {
-	err := this.Conn.Remove(bson.M{"_id": bson.ObjectIdHex(patient.Id)})
+func (this MongoDb) Delete(record map[string]interface{}) bool {
+	err := this.Conn.Remove(bson.M{"_id": record["_id"]})
 	if err == nil {
 		return true
 	} else {
@@ -38,11 +33,12 @@ func (this MongoDb) Delete(patient entity.Patient) bool {
 	}
 }
 
-func (this MongoDb) Update(patient entity.Patient) bool {
-	err := this.Conn.UpdateId(bson.ObjectIdHex(patient.Id), bson.M{"PersonalDetail": patient.PersonalDetail, "ContactDetail": patient.ContactDetail, "Height": patient.Height, "Weight": patient.Weight})
+func (this MongoDb) Update(record map[string]interface{}) bool {
+	err := this.Conn.UpdateId(record["_id"], record)
 	if err == nil {
 		return true
 	} else {
 		return false
 	}
 }
+
