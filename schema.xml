@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+	<field name="name" type="string"/>
+	<field name="age" type="integer"/>	
+	<field name="address" type="string"/>	
+	<field name="city" type="string"/>		
+</table>
