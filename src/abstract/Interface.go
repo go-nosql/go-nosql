@@ -1,8 +1,10 @@
 package abstract
 
+import "db/entity"
+
 type Database interface {
 	Save(interface{}) bool
-	Read() []map[string]interface{}
+	Read() []entity.Map
 	Update(map[string]interface{}) bool
 	Delete(map[string]interface{}) bool
 }

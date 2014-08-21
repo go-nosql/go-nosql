@@ -9,34 +9,18 @@ import (
 	"abstract"
 	"os"
 	"x2j-master"
+	"db/entity"
+	"reflect"
 )
 
-func GetConnection(path string) (abstract.Database,map[string]interface{}) {
+var gpath string
 
+func GetConnection(path string) (abstract.Database) {
+	gpath = path
 	var collection *mgo.Collection
-	conf, err := configparser.Read(path)
-	if err != nil {
-		panic(err)
-	}
+	conf, _ := configparser.Read(gpath)
+	checkError(conf, "Invalid configuration file")
 	driver_config, _ := conf.Section("nosql.db")
-
-
-	xmlFile, _ := os.Open(driver_config.ValueOf("schemalocation"))
-        stat, _ := xmlFile.Stat()
-        bs := make([]byte, stat.Size())
-        _,_ = xmlFile.Read(bs)
-        str := string(bs)
-        var m map[string]interface{}
-        m,_ = x2j.DocToMap(str, false)
-        field := m["table"].(map[string]interface{})
-        arr := field["field"].([]interface{})
-        schema := make(map[string]interface{}, len(arr))
-        for _, v := range arr {
-        	t := v.(map[string]interface{})
-        	schema[t["-name"].(string)] = t["-type"]
-        }
-        
-
 
 	var db_config *configparser.Section
 	//to make name of the database in config file case-insensitive
@@ -55,21 +39,43 @@ func GetConnection(path string) (abstract.Database,map[string]interface{}) {
 		} else {
 			db, _ = couch.NewDatabaseByURL("http://" + db_config.ValueOf("user") + ":" + db_config.ValueOf("password") + "@" + db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port") + "/" + db_config.ValueOf("dbname"))
 		}
-		return abstract.Database(supported_db.CouchDb{db}),schema
+		return abstract.Database(supported_db.CouchDb{db})
 	case "MONGO":
 		var mongoSession *mgo.Session
+		var err error
 		if db_config.ValueOf("user") == "" {
 			mongoSession, err = mgo.Dial(db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port"))
 		} else {
 			mongoSession, err = mgo.Dial(db_config.ValueOf("user") + ":" + db_config.ValueOf("password") + "@" + db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port") + "/" + db_config.ValueOf("dbname"))
 		}
-		if err != nil {
-			panic(err)
-		} else {
-			db := mongoSession.DB(db_config.ValueOf("dbname"))
-			collection = db.C(db_config.ValueOf("collectionname"))
-		}
-		return abstract.Database(supported_db.MongoDb{collection}),schema
+		checkError(mongoSession, err)
+		db := mongoSession.DB(db_config.ValueOf("dbname"))
+		collection = db.C(db_config.ValueOf("collectionname"))
+		return abstract.Database(supported_db.MongoDb{collection})
+	default:
+		panic("Supports only Couch or MongoDb")
 	}
-	return nil,nil
+	return nil
+}
+
+func NewRecord() entity.Map {
+        conf, _ := configparser.Read(gpath)
+	checkError(conf, "Invalid configuration file")
+        driver_config, _ := conf.Section("nosql.db")
+        xmlFile, _ := os.Open(driver_config.ValueOf("schemalocation"))
+        stat, _ := xmlFile.Stat()
+        checkError(stat,"Invalid schema file")
+        bs := make([]byte, stat.Size())
+        _, _ = xmlFile.Read(bs)
+        var m map[string]interface{}
+        m, _ = x2j.DocToMap(string(bs), false)
+        checkError(m["schema"], "Invalid schema definition")
+        finalMap := entity.Map(m["schema"].(map[string]interface{}))
+	return finalMap
+}
+
+func checkError(object interface{}, errMsg interface{}) {
+	if object == nil || reflect.ValueOf(object).IsNil() {
+		panic(errMsg)
+	}
 }

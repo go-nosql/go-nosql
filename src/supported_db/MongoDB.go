@@ -3,14 +3,15 @@ package supported_db
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"db/entity"
 )
 
 type MongoDb struct {
 	Conn *mgo.Collection
 }
 
-func (this MongoDb) Read() []map[string]interface{} {
-	var records []map[string]interface{}
+func (this MongoDb) Read() []entity.Map {
+	var records []entity.Map
 	this.Conn.Find(nil).All(&records)
 	return records
 }

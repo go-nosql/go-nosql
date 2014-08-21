@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<table>
-	<field name="name" type="string"/>
-	<field name="age" type="integer"/>	
-	<field name="address" type="string"/>	
-	<field name="city" type="string"/>		
-</table>
+
+<schema>
+
+	<student>
+		<name/>
+		<age/>	
+		<communication>
+			<telephone/>
+			<address>
+				<address1/>
+				<address2/>
+				<city/>
+			</address>
+		</communication>
+	</student>
+
+
+	<employee>
+		<name/>
+		<age/>	
+		<communication>
+			<telephone/>
+			<address>
+				<address1/>
+				<address2/>
+				<city/>
+			</address>
+		</communication>
+	</employee>
+
+</schema>

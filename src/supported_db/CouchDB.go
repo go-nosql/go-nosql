@@ -3,6 +3,7 @@ package supported_db
 import (
 	"couch-go-master"
 	"fmt"
+	"db/entity"
 )
 
 type CouchDb struct {
@@ -18,9 +19,9 @@ func (this CouchDb) Save(record interface{}) bool {
 	}
 }
 
-func (this CouchDb) Read() []map[string]interface{} {
+func (this CouchDb) Read() []entity.Map {
 	ids, err := this.Conn.QueryIds("_all_docs", nil)
-	records := make([]map[string]interface{}, len(ids))
+	records := make([]entity.Map, len(ids))
 	if err != nil {
 		panic(err)
 	} else {
