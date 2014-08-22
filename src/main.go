@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-
+//main - main method to implement GO ORM - NoSQL
 func main() {
 	database := db.GetConnection("config.ini") //Pass configuration file location
 	record := db.NewRecord()
@@ -28,4 +28,3 @@ func main() {
 	//Delete
 	//database.Delete(a[0])
 }
-
