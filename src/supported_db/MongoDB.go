@@ -47,3 +47,41 @@ func (this MongoDb) Update(record map[string]interface{}) bool {
 		return false
 	}
 }
+
+// First - Read first record from mongoDB 
+func (this MongoDb) First() entity.Map {
+        var record entity.Map
+        this.Conn.Find(nil).One(&record)
+        return record
+}
+
+// Last - Read last record from mongoDB 
+func (this MongoDb) Last() entity.Map {
+        var record entity.Map
+        count, _ := this.Conn.Count()
+        this.Conn.Find(nil).Skip(count-1).One(&record)
+        return record
+}
+
+// Count - Read number of records from mongoDB
+func (this MongoDb) Count() int {
+        count, _ := this.Conn.Count()
+        return count
+}
+
+// Limit - Read limited number of records from mongoDB.
+func (this MongoDb) Limit(limit int) []entity.Map {
+        var records []entity.Map
+	if limit <= 0 {
+		return records
+	}
+        this.Conn.Find(nil).Limit(limit).All(&records)
+        return records
+}
+
+// FindById - Read records by id from mongoDB.
+func (this MongoDb) FindById(id string) entity.Map {
+        var record entity.Map
+        this.Conn.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&record)
+        return record
+}

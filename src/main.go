@@ -19,6 +19,10 @@ func main() {
 
 	//Read
 	a := database.Read()
+	//a := database.FindById("98c7c841105ee099229b90f0f7000318")
+	//a := database.First()
+	//a := database.Limit(2)
+	//a := database.Count()
 	fmt.Println(a)
 
 	//Update
