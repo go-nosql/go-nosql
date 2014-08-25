@@ -4,6 +4,8 @@ import (
 	"db/entity"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"strings"
+	"strconv"
 )
 
 // MongoDB - Struct for mongo database.
@@ -76,6 +78,28 @@ func (this MongoDb) Limit(limit int) []entity.Map {
 		return records
 	}
         this.Conn.Find(nil).Limit(limit).All(&records)
+        return records
+}
+
+// Where - Get the records based on query string.
+func (this MongoDb) Where(query string) []entity.Map {
+        var records []entity.Map
+	all := strings.Fields(query)
+	value := all[2]
+	var val interface{}
+	if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
+	 val = value[1:(len(value)-1)]
+	} else {
+	 val, _ = strconv.ParseFloat(value,64)
+	}
+	switch all[1] {
+		case "<" : this.Conn.Find(bson.M{all[0]:bson.M{"$lt":val}}).All(&records)
+		case ">" : this.Conn.Find(bson.M{all[0]:bson.M{"$gt":val}}).All(&records)
+		case "=", "==" : this.Conn.Find(bson.M{all[0]:val}).All(&records)
+		case "!=" : this.Conn.Find(bson.M{all[0]:bson.M{"$ne":val}}).All(&records)
+		case "<=" : this.Conn.Find(bson.M{all[0]:bson.M{"$lte":val}}).All(&records)
+		case ">=" : this.Conn.Find(bson.M{all[0]:bson.M{"$gte":val}}).All(&records)
+	}
         return records
 }
 

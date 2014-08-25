@@ -4,6 +4,8 @@ import (
 	"couch-go-master"
 	"db/entity"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 // CouchDb - Struct for couch database.
@@ -67,70 +69,121 @@ func (this CouchDb) Update(record map[string]interface{}) bool {
 
 // First - Read first record from couchDB
 func (this CouchDb) First() entity.Map {
-        ids := getIds(this)
-        record := make(entity.Map)
-        err := this.Conn.RetrieveFast(ids[0], &record)
-        if err != nil {
-                       panic(err)
-                      }
-        return record
+	 ids := getIds(this)
+	 record := make(entity.Map)
+	 err := this.Conn.RetrieveFast(ids[0], &record)
+	 if err != nil {
+ 		panic(err)
+	 }
+	 return record
 }
 
 // Last - Read last record from couchDB
 func (this CouchDb) Last() entity.Map {
-        ids := getIds(this)
-        record := make(entity.Map)
-        err := this.Conn.RetrieveFast(ids[len(ids)-1], &record)
-        if err != nil {
-                       panic(err)
-                      }
-        return record
+	ids := getIds(this)
+	record := make(entity.Map)
+	err := this.Conn.RetrieveFast(ids[len(ids)-1], &record)
+	if err != nil {
+		panic(err)
+	}
+	return record
 }
 
 // Count - Read number of records from couchDB
 func (this CouchDb) Count() int {
-        ids, err := this.Conn.QueryIds("_all_docs", nil)
+	ids, err := this.Conn.QueryIds("_all_docs", nil)
 	if err != nil {
 		return 0
 	}
-        return len(ids)
+	return len(ids)
 }
 
 // Limit - Read limited number of records from couchDB.
 func (this CouchDb) Limit(limit int) []entity.Map {
 	if limit <= 0 {
-		return make([]entity.Map,0)
+		return make([]entity.Map, 0)
 	}
-        ids := getIds(this)
+	ids := getIds(this)
 	if limit > len(ids) {
 		limit = len(ids)
 	}
-        records := make([]entity.Map, limit)
-        for i := 0; i < limit; i++ {
-                err := this.Conn.RetrieveFast(ids[i], &records[i])
-                if err != nil {
-                             panic(err)
-                            }
-                }
-        return records
+	records := make([]entity.Map, limit)
+	for i := 0; i < limit; i++ {
+		err := this.Conn.RetrieveFast(ids[i], &records[i])
+		if err != nil {
+			panic(err)
+		}
+	}
+	return records
 }
-
 
 // FindById - Read record by id from couchDB.
 func (this CouchDb) FindById(id string) entity.Map {
 	var record entity.Map
-        err := this.Conn.RetrieveFast(id, &record)
-        if err != nil {
-                       panic(err)
-                      }
-        return record
+	err := this.Conn.RetrieveFast(id, &record)
+	if err != nil {
+		panic(err)
+	}
+	return record
 }
 
 // getIds - Read all document ids from couchDB.
 func getIds(this CouchDb) []string {
 	ids, err := this.Conn.QueryIds("_all_docs", nil)
 	if err != nil {
-		return make([]string,0)
+		return make([]string, 0)
 	}
 	return ids
+}
+
+// Where - Get the records based on query string.
+func (this CouchDb) Where(query string) []entity.Map {
+	records := this.Read()
+	result := make([]entity.Map, 0)
+	var segs []string = strings.Fields(query)
+	value := segs[2]
+        var fVal interface{}
+        if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
+         fVal = value[1:(len(value)-1)]
+        } else {
+         fVal, _ = strconv.ParseFloat(value,64)
+        }
+
+	for _, rec := range records {
+		val := rec.Get(segs[0])
+		if val != nil {
+			switch segs[1] {
+			case "=", "==":
+				 if fVal == val {
+					result = append(result, rec)
+				 }
+			case "!=":
+                                 if fVal != val {
+                                        result = append(result, rec)
+                                 }
+			case ">":
+				if val.(float64) > fVal.(float64) {
+					result = append(result, rec)
+				}
+			case "<":
+				if val.(float64) < fVal.(float64) {
+					result = append(result, rec)
+				}
+			case ">=":
+				if val.(float64) >= fVal.(float64) {
+					result = append(result, rec)
+				}
+			case "<=":
+				if val.(float64) <= fVal.(float64) {
+					result = append(result, rec)
+				}
+			}
+		} else {
+			if segs[1] == "!=" {
+				result = append(result, rec)
+			}
+		}
+
+	}
+	return result
 }

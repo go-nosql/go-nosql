@@ -68,6 +68,16 @@ Example
 
         	//Read
         	a := database.Read()
+	        //a := database.FindById("98c7c841105ee099229b90f0f7000318")
+	        //a := database.First()
+	        //a := database.Limit(2)
+	        //a := database.Count()
+		/*
+		 Where clause supports single condition only
+		 String comparison : database.Where("name == 'williams'") Must specify single quotes
+		 Numeric comparison : database.Where("student.mark > 52") 
+		*/
+	        //a := database.Where("mark ==  36") 
         	fmt.Println(a)
 
         	//Update

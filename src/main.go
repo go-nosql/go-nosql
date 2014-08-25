@@ -23,6 +23,7 @@ func main() {
 	//a := database.First()
 	//a := database.Limit(2)
 	//a := database.Count()
+	//a := database.Where("mark ==  36")
 	fmt.Println(a)
 
 	//Update

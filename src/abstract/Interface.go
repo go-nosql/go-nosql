@@ -13,4 +13,5 @@ type Database interface {
 	Count() int
 	Limit(int) []entity.Map
 	FindById(string) entity.Map
+	Where(string) []entity.Map
 }
