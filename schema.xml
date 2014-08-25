@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema>
+
+	<student>
+		<name/>
+		<age/>	
+		<communication>
+			<telephone/>
+			<address>
+				<address1/>
+				<address2/>
+				<city/>
+			</address>
+		</communication>
+	</student>
+
+
+	<employee>
+		<name/>
+		<age/>	
+		<communication>
+			<telephone/>
+			<address>
+				<address1/>
+				<address2/>
+				<city/>
+			</address>
+		</communication>
+	</employee>
+
+</schema>

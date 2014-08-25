@@ -2,28 +2,33 @@ package main
 
 import (
 	"db"
-	"db/entity"
 	"fmt"
 )
 
+//main - main method to implement GO ORM - NoSQL
 func main() {
 	database := db.GetConnection("config.ini") //Pass configuration file location
+	record := db.NewRecord()
 
 	//Save
-	//patient := entity.Patient{}
-	//patient.PersonalDetail.FirstName = "NewName"
-	//database.Save(patient)
+	record.Set("student.name", "suriya")
+	record.Set("student.mark", 52)
+	record.Set("student.age", 24)
+	record.Set("employee.name", "williams")
+	database.Save(record)
 
 	//Read
-
-	var patients []entity.Patient
-	patients = database.Read()
-	fmt.Println(patients)
-
-	//Delete
-	//database.Delete(patients[0])
+	a := database.Read()
+	//a := database.FindById("98c7c841105ee099229b90f0f7000318")
+	//a := database.First()
+	//a := database.Limit(2)
+	//a := database.Count()
+	fmt.Println(a)
 
 	//Update
-	//patients[0].PersonalDetail.FirstName = "updated"
-	//database.Update(patients[0])
+	//a[0].Set("student.communication.telephone","2332348")
+	//database.Update(a[0])
+
+	//Delete
+	//database.Delete(a[0])
 }
