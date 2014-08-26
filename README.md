@@ -12,7 +12,6 @@ PreRequisites
 		* couch-go
 		* mgo
 		* configparser
-		* x2j 
 
 CouchDB Installation [Linux]
 ============================
@@ -66,6 +65,11 @@ Example
         	record.Set("employee.name", "williams")
         	database.Save(record)
 
+	        //Saving Json
+        	//jsn := db.NewJson()
+	        //jsn = `{"name":"hello"}`
+	        //database.Save(jsn.ToObject())
+
         	//Read
         	a := database.Read()
 	        //a := database.FindById("98c7c841105ee099229b90f0f7000318")
@@ -79,6 +83,9 @@ Example
 		*/
 	        //a := database.Where("mark ==  36") 
         	fmt.Println(a)
+
+	        //Converting to Json
+	        fmt.Println(a[0].ToJson())
 
         	//Update
         	//a[0].Set("student.communication.telephone","2332348")

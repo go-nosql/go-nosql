@@ -8,14 +8,22 @@ import (
 //main - main method to implement GO ORM - NoSQL
 func main() {
 	database := db.GetConnection("config.ini") //Pass configuration file location
-	record := db.NewRecord()
+	//record := db.NewObject()
+	
 
-	//Save
-	record.Set("student.name", "suriya")
-	record.Set("student.mark", 52)
-	record.Set("student.age", 24)
-	record.Set("employee.name", "williams")
-	database.Save(record)
+	//Saving object
+	//record.Set("student.name", "suriya")
+	//record.Set("student.mark", 52)
+	//record.Set("student.age", 24)
+	//record.Set("employee.name", "williams")
+	//record.Set("fruits",[]string{"apple","orange"})
+	//database.Save(record)
+
+	//Saving Json
+	//jsn := db.NewJson()
+	//jsn = `{"name":"hello"}`
+	//database.Save(jsn.ToObject())
+	
 
 	//Read
 	a := database.Read()
@@ -26,6 +34,9 @@ func main() {
 	//a := database.Where("mark ==  36")
 	fmt.Println(a)
 
+	//Converting to Json
+	fmt.Println(a[0].ToJson())
+	
 	//Update
 	//a[0].Set("student.communication.telephone","2332348")
 	//database.Update(a[0])

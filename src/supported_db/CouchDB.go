@@ -142,39 +142,40 @@ func (this CouchDb) Where(query string) []entity.Map {
 	result := make([]entity.Map, 0)
 	var segs []string = strings.Fields(query)
 	value := segs[2]
-        var fVal interface{}
+        var searchVal interface{}
+	var err error
         if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
-         fVal = value[1:(len(value)-1)]
-        } else {
-         fVal, _ = strconv.ParseFloat(value,64)
-        }
+         searchVal = value[1:(len(value)-1)]
+        } else if searchVal, err = strconv.ParseFloat(value, 64); err!=nil {
+                                       searchVal, err = strconv.ParseBool(value)
+                               }
 
 	for _, rec := range records {
 		val := rec.Get(segs[0])
 		if val != nil {
 			switch segs[1] {
 			case "=", "==":
-				 if fVal == val {
+				 if searchVal == val {
 					result = append(result, rec)
 				 }
 			case "!=":
-                                 if fVal != val {
+                                 if searchVal != val {
                                         result = append(result, rec)
                                  }
 			case ">":
-				if val.(float64) > fVal.(float64) {
+				if val.(float64) > searchVal.(float64) {
 					result = append(result, rec)
 				}
 			case "<":
-				if val.(float64) < fVal.(float64) {
+				if val.(float64) < searchVal.(float64) {
 					result = append(result, rec)
 				}
 			case ">=":
-				if val.(float64) >= fVal.(float64) {
+				if val.(float64) >= searchVal.(float64) {
 					result = append(result, rec)
 				}
 			case "<=":
-				if val.(float64) <= fVal.(float64) {
+				if val.(float64) <= searchVal.(float64) {
 					result = append(result, rec)
 				}
 			}

@@ -87,11 +87,12 @@ func (this MongoDb) Where(query string) []entity.Map {
 	all := strings.Fields(query)
 	value := all[2]
 	var val interface{}
+	var err error
 	if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
 	 val = value[1:(len(value)-1)]
-	} else {
-	 val, _ = strconv.ParseFloat(value,64)
-	}
+	} else if val, err = strconv.ParseFloat(value, 64); err!=nil {
+         	val, err = strconv.ParseBool(value)
+        }
 	switch all[1] {
 		case "<" : this.Conn.Find(bson.M{all[0]:bson.M{"$lt":val}}).All(&records)
 		case ">" : this.Conn.Find(bson.M{all[0]:bson.M{"$gt":val}}).All(&records)
