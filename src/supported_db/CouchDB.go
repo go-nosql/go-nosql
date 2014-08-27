@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"reflect"
 )
 
 // CouchDb - Struct for couch database.
@@ -15,6 +16,9 @@ type CouchDb struct {
 
 // Save - Save generic record in couchDB.
 func (this CouchDb) Save(record interface{}) bool {
+	if reflect.TypeOf(record).String() == "string" {
+		record = entity.Json(record.(string)).ToObject()
+	}
 	id, rev, err := this.Conn.Insert(record)
 	if err == nil && id != "" && rev != "" {
 		return true
@@ -37,10 +41,13 @@ func (this CouchDb) Read() []entity.Map {
 }
 
 // Delete - Delete generic record in couchDB.
-func (this CouchDb) Delete(record map[string]interface{}) bool {
-	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s", record["_id"]), &record)
+func (this CouchDb) Delete(record interface{}) bool {
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+        }
+	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s", record.(entity.Map)["_id"]), &record)
 	if err == nil && rev != "" {
-		err = this.Conn.Delete(fmt.Sprintf("%s", record["_id"]), rev)
+		err = this.Conn.Delete(fmt.Sprintf("%s", record.(map[string]interface{})["_id"]), rev)
 		if err == nil {
 			return true
 		} else {
@@ -52,11 +59,14 @@ func (this CouchDb) Delete(record map[string]interface{}) bool {
 }
 
 // Update - Update record in couchDB.
-func (this CouchDb) Update(record map[string]interface{}) bool {
+func (this CouchDb) Update(record interface{}) bool {
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+        }
 	var r map[string]interface{}
-	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s", record["_id"]), &r)
+	rev, err := this.Conn.Retrieve(fmt.Sprintf("%s", record.(entity.Map)["_id"]), &r)
 	if err == nil {
-		rev, err = this.Conn.EditWith(record, fmt.Sprintf("%s", record["_id"]), rev)
+		rev, err = this.Conn.EditWith(record, fmt.Sprintf("%s", record.(entity.Map)["_id"]), rev)
 		if err == nil {
 			return true
 		} else {

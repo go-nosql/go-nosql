@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"strings"
 	"strconv"
+	"reflect"
 )
 
 // MongoDB - Struct for mongo database.
@@ -22,6 +23,9 @@ func (this MongoDb) Read() []entity.Map {
 
 // Save - Save generic record in mongoDB.
 func (this MongoDb) Save(record interface{}) bool {
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+        }
 	err := this.Conn.Insert(record)
 	if err == nil {
 		return true
@@ -31,8 +35,14 @@ func (this MongoDb) Save(record interface{}) bool {
 }
 
 // Delete - Delete generic record in mongoDB.
-func (this MongoDb) Delete(record map[string]interface{}) bool {
-	err := this.Conn.Remove(bson.M{"_id": record["_id"]})
+func (this MongoDb) Delete(record interface{}) bool {
+	var err error
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+		err = this.Conn.Remove(bson.M{"_id": bson.ObjectIdHex(record.(entity.Map)["_id"].(string))})
+        } else {
+		err = this.Conn.Remove(bson.M{"_id": record.(entity.Map)["_id"]})
+	}
 	if err == nil {
 		return true
 	} else {
@@ -41,8 +51,13 @@ func (this MongoDb) Delete(record map[string]interface{}) bool {
 }
 
 // Update - Update record in mongoDB.
-func (this MongoDb) Update(record map[string]interface{}) bool {
-	err := this.Conn.UpdateId(record["_id"], record)
+func (this MongoDb) Update(record interface{}) bool {
+        var err error
+        if reflect.TypeOf(record).String() == "string" {
+		record = entity.Json(record.(string)).ToObject()
+		record.(entity.Map)["_id"] = bson.ObjectIdHex(record.(entity.Map)["_id"].(string))
+        }
+	err = this.Conn.UpdateId(record.(entity.Map)["_id"], record)
 	if err == nil {
 		return true
 	} else {
@@ -104,7 +119,7 @@ func (this MongoDb) Where(query string) []entity.Map {
         return records
 }
 
-// FindById - Read records by id from mongoDB.
+// FindById - Read record by id from mongoDB.
 func (this MongoDb) FindById(id string) entity.Map {
         var record entity.Map
         this.Conn.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&record)
