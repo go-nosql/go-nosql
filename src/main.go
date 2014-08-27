@@ -12,56 +12,56 @@ func main() {
 	database := db.GetConnection("config.ini") //Pass configuration file location
 
 	//Create and return a new object
-	record := db.NewObject()
+	//record := db.NewObject()
 
 	//Saving object
-	record.Set("student.name", "suriya")
-	record.Set("student.mark", 52)
-	record.Set("student.age", 24)
-	record.Set("employee.name", "williams")
-	record.Set("fruits",[]string{"apple","orange"})
-	database.Save(record)
+	//record.Set("student.name", "suriya")
+	//record.Set("student.mark", 52)
+	//record.Set("student.age", 24)
+	//record.Set("employee.name", "williams")
+	//record.Set("fruits",[]string{"apple","orange"})
+	//database.Save(record)
 
 	//Saving Json
-	database.Save(`{"name":"hello"}`)
+	//database.Save(`{"name":"hello"}`)
 
 	//Read all records from database
-	a := database.Read()
-	fmt.Println(a)
+	allRec := database.Read()
+	fmt.Println(allRec)
 
 	//Read record by id from database
-	a := database.FindById("98c7c841105ee099229b90f0f7000318")
-	fmt.Println(a)
+	recById := database.FindById("53fd9d1eb0985415f02f75e2")
+	fmt.Println(recById)
 
 	//Read first record from database
-	a := database.First()
-	fmt.Println(a)
+	recFirst := database.First()
+	fmt.Println(recFirst)
 	
 	//Read limited number of records from database
-	a := database.Limit(2)
-	fmt.Println(a)
+	recLimit := database.Limit(2)
+	fmt.Println(recLimit)
 
 	//Get record count from database
-	a := database.Count()
-	fmt.Println(a)
+	count := database.Count()
+	fmt.Println(count)
 	
 	//Get records based on query string.
-	a := database.Where("mark ==  36")
-	fmt.Println(a)
+	recWhere := database.Where("mark ==  36")
+	fmt.Println(recWhere)
 
 	//Converting to Json
-	fmt.Println(a[0].ToJson())
+	fmt.Println(allRec[0].ToJson())
 	
 	//Update using object
-	a[0].Set("student.communication.telephone","2332348")
-	database.Update(a[0])
+	//allRec[0].Set("student.communication.telephone","2332348")
+	//database.Update(allRec[0])
 
 	//Update using json
-	database.Update(`{"_id":"4deaf29629ea5cf3438cb3043100397d","name":"hello"}`)
+	//database.Update(`{"_id":"53fd9cf3b0985415f02f75e1","name":"world"}`)
 
 	//Delete using object
-	database.Delete(a[0])
+	//database.Delete(allRec[1])
 	
 	//Delete using json
-	database.Delete(`{"_id":"53fd78d9b0985415f02f75de"}`)
+	//database.Delete(`{"_id":"53fd78d9b0985415f02f75de"}`)
 }
