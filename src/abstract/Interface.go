@@ -6,11 +6,12 @@ import "db/entity"
 type Database interface {
 	Save(interface{}) bool
 	Read() []entity.Map
-	Update(map[string]interface{}) bool
-	Delete(map[string]interface{}) bool
+	Update(interface{}) bool
+	Delete(interface{}) bool
         First() entity.Map
         Last() entity.Map
 	Count() int
 	Limit(int) []entity.Map
 	FindById(string) entity.Map
+	Where(string) []entity.Map
 }

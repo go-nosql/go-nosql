@@ -6,21 +6,15 @@ import (
 	"couch-go-master"
 	"db/entity"
 	"gopkg.in/mgo.v2"
-	"os"
 	"reflect"
 	"strings"
 	"supported_db"
-	"x2j-master"
 )
-
-// gpath - Global variable to store config file location.
-var gpath string
 
 // GetConnection - Return DB connection object based on config file.
 func GetConnection(path string) abstract.Database {
-	gpath = path
 	var collection *mgo.Collection
-	conf, _ := configparser.Read(gpath)
+	conf, _ := configparser.Read(path)
 	checkError(conf, "Invalid configuration file")
 	driver_config, _ := conf.Section("nosql.db")
 
@@ -59,21 +53,21 @@ func GetConnection(path string) abstract.Database {
 	return nil
 }
 
-//NewRecord - Create and return a new object of type Map.
-func NewRecord() entity.Map {
-	conf, _ := configparser.Read(gpath)
-	checkError(conf, "Invalid configuration file")
-	driver_config, _ := conf.Section("nosql.db")
-	xmlFile, _ := os.Open(driver_config.ValueOf("schemalocation"))
-	stat, _ := xmlFile.Stat()
-	checkError(stat, "Invalid schema file")
-	bs := make([]byte, stat.Size())
-	_, _ = xmlFile.Read(bs)
-	var m map[string]interface{}
-	m, _ = x2j.DocToMap(string(bs), false)
-	checkError(m["schema"], "Invalid schema definition")
-	finalMap := entity.Map(m["schema"].(map[string]interface{}))
-	return finalMap
+//NewObject - Create and return a new object of type Map.
+func NewObject() entity.Map {
+	return make(entity.Map)
+}
+
+// NewJson - Create and return a new object of type Json.
+// Ex. jsn := NewJson(`{"name":"abc","age":24}`)
+// or
+// jsn := NewJson()
+// jsn = `{"name":"abc","age":24}`
+func NewJson(s ...string) entity.Json {
+	if len(s) == 0 {
+		return entity.Json("")
+	}
+        return entity.Json(s[0])
 }
 
 // checkError - Private function to check errors.

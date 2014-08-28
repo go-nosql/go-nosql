@@ -1,9 +1,13 @@
 package entity
 
-import "strings"
+import (
+	"strings"
+	"encoding/json"
+)
 
 // Map - Generic type to handle all schema
 type Map map[string]interface{}
+type Json string
 
 // Get - gets the value from the map.
 func (d Map) Get(keypath string) interface{} {
@@ -45,4 +49,17 @@ func (d Map) Set(keypath string, value interface{}) Map {
 		}
 	}
 	return d
+}
+
+// ToJson - converts map to json
+func (d Map) ToJson() Json {
+	a, _ := json.Marshal(d)
+	return Json(a)
+}
+
+// ToObject - converts json to object
+func (j Json) ToObject() Map {
+        var v interface{}
+	json.Unmarshal([]byte(j), &v)
+        return Map(v.(map[string]interface{}))
 }

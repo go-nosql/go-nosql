@@ -12,7 +12,6 @@ PreRequisites
 		* couch-go
 		* mgo
 		* configparser
-		* x2j 
 
 CouchDB Installation [Linux]
 ============================
@@ -56,24 +55,64 @@ Example
 	)
 
 	func main() {
+
+		//Return DB connection object based on config file
         	database := db.GetConnection("config.ini") //Pass configuration file location
+
+		//Create and return a new object
         	record := db.NewRecord() // Before calling NewRecord method GetConnection method should be called
 
-        	//Save
+        	//Saving Object
         	record.Set("student.name", "suriya")
         	record.Set("student.mark", 52)
         	record.Set("student.age", 24)
         	record.Set("employee.name", "williams")
         	database.Save(record)
 
-        	//Read
+	        //Saving Json
+	        //database.Save(`{"name":"hello"}`)
+
+        	//Read all records from database
         	a := database.Read()
+		fmt.Println(a)
+
+		//Read record by id from database
+	        a := database.FindById("98c7c841105ee099229b90f0f7000318")
+		fmt.Println(a)
+
+		//Read first record from database
+	        a := database.First()
+		fmt.Println(a)
+
+		//Read limited number of records from database
+	        a := database.Limit(2)
+		fmt.Println(a)
+	
+		//Get record count from database	
+	        a := database.Count()
+		fmt.Println(a)
+
+		/*
+		 Where clause supports single condition only
+		 String comparison : database.Where("name == 'williams'") Must specify single quotes
+		 Numeric comparison : database.Where("student.mark > 52") 
+		*/
+	        a := database.Where("mark ==  36") 
         	fmt.Println(a)
 
-        	//Update
-        	//a[0].Set("student.communication.telephone","2332348")
-        	//database.Update(a[0])
+	        //Converting to Json
+	        fmt.Println(a[0].ToJson())
 
-        	//Delete
-        	//database.Delete(a[0])
+        	//Update using object
+        	a[0].Set("student.communication.telephone","2332348")
+        	database.Update(a[0])
+
+		//Update using json
+		database.Update(`{"_id":"4deaf29629ea5cf3438cb3043100397d","name":"hello"}`)
+
+        	//Delete using object
+        	database.Delete(a[0])
+
+		//Delete using json
+		database.Delete(`{"_id":"53fd78d9b0985415f02f75de"}`)
 	}
