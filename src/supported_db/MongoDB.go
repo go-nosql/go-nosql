@@ -29,9 +29,8 @@ func (this MongoDb) Save(record interface{}) bool {
 	err := this.Conn.Insert(record)
 	if err == nil {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // Delete - Delete generic record in mongoDB.
@@ -45,9 +44,8 @@ func (this MongoDb) Delete(record interface{}) bool {
 	}
 	if err == nil {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // Update - Update record in mongoDB.
@@ -60,15 +58,14 @@ func (this MongoDb) Update(record interface{}) bool {
 	err = this.Conn.UpdateId(record.(entity.Map)["_id"], record)
 	if err == nil {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // First - Read first record from mongoDB 
 func (this MongoDb) First() entity.Map {
         var record entity.Map
-        this.Conn.Find(nil).One(&record)
+        _ = this.Conn.Find(nil).One(&record)
         return record
 }
 
@@ -76,13 +73,16 @@ func (this MongoDb) First() entity.Map {
 func (this MongoDb) Last() entity.Map {
         var record entity.Map
         count, _ := this.Conn.Count()
-        this.Conn.Find(nil).Skip(count-1).One(&record)
+        _ = this.Conn.Find(nil).Skip(count-1).One(&record)
         return record
 }
 
 // Count - Read number of records from mongoDB
 func (this MongoDb) Count() int {
-        count, _ := this.Conn.Count()
+        count, err := this.Conn.Count()
+	if err != nil {
+		return -1
+	}
         return count
 }
 
@@ -111,7 +111,16 @@ func (this MongoDb) Where(query string) []entity.Map {
 	switch all[1] {
 		case "<" : this.Conn.Find(bson.M{all[0]:bson.M{"$lt":val}}).All(&records)
 		case ">" : this.Conn.Find(bson.M{all[0]:bson.M{"$gt":val}}).All(&records)
-		case "=", "==" : this.Conn.Find(bson.M{all[0]:val}).All(&records)
+		case "=", "==" :
+				if all[0] == "_id" {
+					recById := this.FindById(val.(string))
+					if recById != nil {
+						records = make([]entity.Map,1)
+						records[0] = recById
+					}
+				} else {
+					this.Conn.Find(bson.M{all[0]:val}).All(&records)
+				}
 		case "!=" : this.Conn.Find(bson.M{all[0]:bson.M{"$ne":val}}).All(&records)
 		case "<=" : this.Conn.Find(bson.M{all[0]:bson.M{"$lte":val}}).All(&records)
 		case ">=" : this.Conn.Find(bson.M{all[0]:bson.M{"$gte":val}}).All(&records)
