@@ -23,6 +23,9 @@ func (this MongoDb) Read() []entity.Map {
 
 // Save - Save generic record in mongoDB.
 func (this MongoDb) Save(record interface{}) bool {
+	if record == nil {
+		return false
+	}
         if reflect.TypeOf(record).String() == "string" {
                 record = entity.Json(record.(string)).ToObject()
         }
@@ -35,6 +38,9 @@ func (this MongoDb) Save(record interface{}) bool {
 
 // Delete - Delete generic record in mongoDB.
 func (this MongoDb) Delete(record interface{}) bool {
+	if record == nil {
+		return false
+	}
 	var err error
         if reflect.TypeOf(record).String() == "string" {
                 record = entity.Json(record.(string)).ToObject()
@@ -50,6 +56,9 @@ func (this MongoDb) Delete(record interface{}) bool {
 
 // Update - Update record in mongoDB.
 func (this MongoDb) Update(record interface{}) bool {
+	if record == nil {
+		return false
+	}
         var err error
         if reflect.TypeOf(record).String() == "string" {
 		record = entity.Json(record.(string)).ToObject()
@@ -100,7 +109,10 @@ func (this MongoDb) Limit(limit int) []entity.Map {
 func (this MongoDb) Where(query string) []entity.Map {
         var records []entity.Map
 	all := strings.Fields(query)
-	value := all[2]
+	if len(all) < 3 {
+		return records
+	}
+	value := strings.Join(all[2:len(all)]," ")
 	var val interface{}
 	var err error
 	if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
@@ -131,6 +143,9 @@ func (this MongoDb) Where(query string) []entity.Map {
 // FindById - Read record by id from mongoDB.
 func (this MongoDb) FindById(id string) entity.Map {
         var record entity.Map
+	defer func() {
+		recover()
+	}()
         this.Conn.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&record)
         return record
 }

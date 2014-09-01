@@ -3,12 +3,11 @@ package supported_db
 import (
 	"testing"
 	"abstract"
-	"supported_db"
 	"configparser-master"
 	"couch-go-master"
 )
 
-var database abstract.Database
+var cdatabase abstract.Database
 
 // init - Establish database connection
 func init() {
@@ -21,81 +20,99 @@ func init() {
         } else {
                 db, _ = couch.NewDatabaseByURL("http://" + db_config.ValueOf("user") + ":" + db_config.ValueOf("password") + "@" + db_config.ValueOf("ipaddress") + ":" + db_config.ValueOf("port") + "/" + db_config.ValueOf("dbname"))
         }
-        database = abstract.Database(supported_db.CouchDb{db})
+        cdatabase = abstract.Database(CouchDb{db})
 }
 
 // TestRead - Test reading all the records
-func TestRead(t *testing.T) {
-	if database.Count() != len(database.Read()) {
+func TestCouchRead(t *testing.T) {
+	if cdatabase.Count() != len(cdatabase.Read()) {
 		t.Fatalf("Error when reading records")
 	}
 }
 
 // TestSave - Test saving a record
-func TestSave(t *testing.T) {
-	if database.Save(`{"name":"hello world"}`) == false {
+func TestCouchSave(t *testing.T) {
+	if cdatabase.Save(`{"name":"hello world"}`) == false {
+		t.Fatalf("Error when saving record")
+	}
+	if cdatabase.Save(nil) != false {
 		t.Fatalf("Error when saving record")
 	}
 }
 
 // TestUpdate - Test updating a record
-func TestUpdate(t *testing.T) {
-	if database.Update(database.Read()[0].Set("name","abc")) == false {
+func TestCouchUpdate(t *testing.T) {
+	if cdatabase.Update(cdatabase.Read()[cdatabase.Count()-1].Set("name","hello abc")) == false {
+		t.Fatalf("Error when updating record")
+	}
+	if cdatabase.Update(nil) != false {
 		t.Fatalf("Error when updating record")
 	}
 }
 
 // TestFirst - Test reading first record
-func TestFirst(t *testing.T) {
-	if database.Count() > 0 && database.First() == nil {
+func TestCouchFirst(t *testing.T) {
+	if cdatabase.Count() > 0 && cdatabase.First() == nil {
 		t.Fatalf("Error when reading first record")
 	}
 }
 
 // TestLast - Test reading last record
-func TestLast(t *testing.T) {
-        if database.Count() > 0 && database.Last() == nil {
+func TestCouchLast(t *testing.T) {
+        if cdatabase.Count() > 0 && cdatabase.Last() == nil {
                 t.Fatalf("Error when reading last record")
         }
 }
 
 // TestCount - Test reading records count
-func TestCount(t *testing.T) {
-	if database.Count() < 0 {
+func TestCouchCount(t *testing.T) {
+	if cdatabase.Count() < 0 {
 		t.Fatalf("Error when reading records count")
 	}
 }
 
 // TestLimit - Test reading limited records
-func TestLimit(t *testing.T) {
-	if database.Count() >= 1 && len(database.Limit(1)) != 1 {
+func TestCouchLimit(t *testing.T) {
+	if cdatabase.Count() >= 1 && len(cdatabase.Limit(1)) != 1 {
+		t.Fatalf("Error when reading limited records")
+	}
+	if len(cdatabase.Limit(-5)) != 0 {
 		t.Fatalf("Error when reading limited records")
 	}
 }
 
 // TestWhere - Test reading records with specified values
-func TestWhere(t *testing.T) {
-	if database.Count() > 0 {
-		idString := database.Read()[0].Get("_id").(string)
-		if len(database.Where("_id == '" + idString + "'")) < 1 {
+func TestCouchWhere(t *testing.T) {
+	if cdatabase.Count() > 0 {
+		idString := cdatabase.Read()[0].Get("_id").(string)
+		if len(cdatabase.Where("_id == '" + idString + "'")) < 1 {
+			t.Fatalf("Error when reading records with specified values")
+		}
+		if len(cdatabase.Where("name == '" + cdatabase.Read()[cdatabase.Count()-1].Get("name").(string) + "'")) < 1 {
 			t.Fatalf("Error when reading records with specified values")
 		}
 	}
 }
 
 // TestFindById - Test reading a record by its id
-func TestFindById(t *testing.T) {
-	if database.Count() > 0 {
-		idString := database.Read()[0].Get("_id").(string)
-		if database.FindById(idString) == nil {
+func TestCouchFindById(t *testing.T) {
+	if cdatabase.Count() > 0 {
+		idString := cdatabase.Read()[0].Get("_id").(string)
+		if cdatabase.FindById(idString) == nil {
 			t.Fatalf("Error when reading record with specified id")
 		}
 	}
+        if cdatabase.FindById("invalidid") != nil {
+                t.Fatalf("Error when reading record with specified id")
+        }
 }
 
 // TestDelete - Test deleting a record
-func TestDelete(t *testing.T) {
-	if database.Delete(database.Read()[0]) == false {
+func TestCouchDelete(t *testing.T) {
+	if cdatabase.Delete(cdatabase.Read()[cdatabase.Count()-1]) == false {
+		t.Fatalf("Error when deleting record")
+	}
+	if cdatabase.Delete(nil) != false {
 		t.Fatalf("Error when deleting record")
 	}
 }
