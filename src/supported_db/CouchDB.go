@@ -22,9 +22,8 @@ func (this CouchDb) Save(record interface{}) bool {
 	id, rev, err := this.Conn.Insert(record)
 	if err == nil && id != "" && rev != "" {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // Read - Read all records from couchDB.
@@ -32,10 +31,7 @@ func (this CouchDb) Read() []entity.Map {
 	ids := getIds(this)
 	records := make([]entity.Map, len(ids))
 	for i := 0; i < len(ids); i++ {
-		err := this.Conn.RetrieveFast(ids[i], &records[i])
-		if err != nil {
-			panic(err)
-		}
+		_ = this.Conn.RetrieveFast(ids[i], &records[i])
 	}
 	return records
 }
@@ -50,12 +46,9 @@ func (this CouchDb) Delete(record interface{}) bool {
 		err = this.Conn.Delete(fmt.Sprintf("%s", record.(map[string]interface{})["_id"]), rev)
 		if err == nil {
 			return true
-		} else {
-			return false
 		}
-	} else {
-		return false
 	}
+	return false
 }
 
 // Update - Update record in couchDB.
@@ -69,22 +62,18 @@ func (this CouchDb) Update(record interface{}) bool {
 		rev, err = this.Conn.EditWith(record, fmt.Sprintf("%s", record.(entity.Map)["_id"]), rev)
 		if err == nil {
 			return true
-		} else {
-			return false
 		}
 	} else {
 		panic(err)
 	}
+	return false
 }
 
 // First - Read first record from couchDB
 func (this CouchDb) First() entity.Map {
 	 ids := getIds(this)
 	 record := make(entity.Map)
-	 err := this.Conn.RetrieveFast(ids[0], &record)
-	 if err != nil {
- 		panic(err)
-	 }
+	 _ = this.Conn.RetrieveFast(ids[0], &record)
 	 return record
 }
 
@@ -92,10 +81,7 @@ func (this CouchDb) First() entity.Map {
 func (this CouchDb) Last() entity.Map {
 	ids := getIds(this)
 	record := make(entity.Map)
-	err := this.Conn.RetrieveFast(ids[len(ids)-1], &record)
-	if err != nil {
-		panic(err)
-	}
+	_ = this.Conn.RetrieveFast(ids[len(ids)-1], &record)
 	return record
 }
 
@@ -103,7 +89,7 @@ func (this CouchDb) Last() entity.Map {
 func (this CouchDb) Count() int {
 	ids, err := this.Conn.QueryIds("_all_docs", nil)
 	if err != nil {
-		return 0
+		return -1
 	}
 	return len(ids)
 }
@@ -119,10 +105,7 @@ func (this CouchDb) Limit(limit int) []entity.Map {
 	}
 	records := make([]entity.Map, limit)
 	for i := 0; i < limit; i++ {
-		err := this.Conn.RetrieveFast(ids[i], &records[i])
-		if err != nil {
-			panic(err)
-		}
+		_ = this.Conn.RetrieveFast(ids[i], &records[i])
 	}
 	return records
 }
@@ -130,19 +113,13 @@ func (this CouchDb) Limit(limit int) []entity.Map {
 // FindById - Read record by id from couchDB.
 func (this CouchDb) FindById(id string) entity.Map {
 	var record entity.Map
-	err := this.Conn.RetrieveFast(id, &record)
-	if err != nil {
-		panic(err)
-	}
+	_ = this.Conn.RetrieveFast(id, &record)
 	return record
 }
 
 // getIds - Read all document ids from couchDB.
 func getIds(this CouchDb) []string {
-	ids, err := this.Conn.QueryIds("_all_docs", nil)
-	if err != nil {
-		return make([]string, 0)
-	}
+	ids, _ := this.Conn.QueryIds("_all_docs", nil)
 	return ids
 }
 
@@ -155,10 +132,10 @@ func (this CouchDb) Where(query string) []entity.Map {
         var searchVal interface{}
 	var err error
         if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {
-         searchVal = value[1:(len(value)-1)]
+                searchVal = value[1:(len(value)-1)]
         } else if searchVal, err = strconv.ParseFloat(value, 64); err!=nil {
-                                       searchVal, err = strconv.ParseBool(value)
-                               }
+                searchVal, err = strconv.ParseBool(value)
+        }
 
 	for _, rec := range records {
 		val := rec.Get(segs[0])
