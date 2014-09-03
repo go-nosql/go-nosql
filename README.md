@@ -1,17 +1,20 @@
 go-orm
 ======
 
-ORM for No-SQL databases
+ORM for No-SQL databases //Supports Map and Json data formats
 
 PreRequisites
 =============
 
 	* CouchDB
 	* MongoDB
-	* golang packages //Refer Deployment section to install golang packages
+	* golang packages 
 		* couch-go
+			//To install this package run "go get github.com/peterbourgon/couch-go"
 		* mgo
+			//To install this package run "go get gopkg.in/mgo.v2"
 		* configparser
+			//To install this package run "go get github.com/alyu/configparser"
 
 CouchDB Installation [Linux]
 ============================
@@ -39,10 +42,7 @@ MongoDB Installation [Linux]
 Deployment
 ==========
 
-	1 . Download the package from github
-	2 . Extract the file in $GOROOT/src/pkg/
-	3 . cd $GOROOT/src/pkg/go-orm/src/db/
-	4 . go install (It will create $GOROOT/pkg/linux_amd64/go-orm/src/db.a file)
+	go get github.com/go-nosql/go-nosql
 
 Example 
 =======
@@ -50,7 +50,7 @@ Example
 	package main
 
 	import (
-            "go-orm/src/db"
+            "github.com/go-nosql/go-nosql/src/db"
             "fmt"
 	)
 

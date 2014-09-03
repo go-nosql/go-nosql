@@ -4,7 +4,7 @@ import (
 	"testing"
 	"abstract"
 	"gopkg.in/mgo.v2/bson"
-	"configparser-master"
+	"github.com/alyu/configparser"
 	"gopkg.in/mgo.v2"
 )
 

@@ -3,8 +3,8 @@ package supported_db
 import (
 	"testing"
 	"abstract"
-	"configparser-master"
-	"couch-go-master"
+	"github.com/alyu/configparser"
+	"github.com/peterbourgon/couch-go"
 )
 
 var cdatabase abstract.Database

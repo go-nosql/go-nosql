@@ -27,7 +27,7 @@ func (this MongoDb) Save(record interface{}) bool {
 		return false
 	}
         if reflect.TypeOf(record).String() == "string" {
-                record = entity.Json(record.(string)).ToObject()
+                record = entity.Json(record.(string)).ToObject() //convert Json to Map object
         }
 	err := this.Conn.Insert(record)
 	if err == nil {
@@ -59,12 +59,11 @@ func (this MongoDb) Update(record interface{}) bool {
 	if record == nil {
 		return false
 	}
-        var err error
         if reflect.TypeOf(record).String() == "string" {
 		record = entity.Json(record.(string)).ToObject()
 		record.(entity.Map)["_id"] = bson.ObjectIdHex(record.(entity.Map)["_id"].(string))
         }
-	err = this.Conn.UpdateId(record.(entity.Map)["_id"], record)
+	err := this.Conn.UpdateId(record.(entity.Map)["_id"], record)
 	if err == nil {
 		return true
 	}

@@ -1,7 +1,7 @@
 package supported_db
 
 import (
-	"couch-go-master"
+	"github.com/peterbourgon/couch-go"
 	"db/entity"
 	"fmt"
 	"strconv"
@@ -20,7 +20,7 @@ func (this CouchDb) Save(record interface{}) bool {
 		return false
 	}
 	if reflect.TypeOf(record).String() == "string" {
-		record = entity.Json(record.(string)).ToObject()
+		record = entity.Json(record.(string)).ToObject() //convert Json to Map object
 	}
 	id, rev, err := this.Conn.Insert(record)
 	if err == nil && id != "" && rev != "" {
@@ -96,11 +96,7 @@ func (this CouchDb) Last() entity.Map {
 
 // Count - Read number of records from couchDB
 func (this CouchDb) Count() int {
-	ids, err := this.Conn.QueryIds("_all_docs", nil)
-	if err != nil {
-		return -1
-	}
-	return len(ids)
+	return len(getIds(this))
 }
 
 // Limit - Read limited number of records from couchDB.
