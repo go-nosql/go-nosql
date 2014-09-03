@@ -1,4 +1,4 @@
-package nosql-orm
+package nosql_orm
 
 import _"github.com/go-nosql/go-nosql/src/db" 
 
