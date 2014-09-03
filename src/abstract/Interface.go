@@ -1,6 +1,6 @@
 package abstract
 
-import "db/entity"
+import "github.com/go-nosql/go-nosql/src/db/entity"
 
 // Database - Interface to define basic DB functionalities.
 type Database interface {

@@ -1,7 +1,7 @@
 package supported_db
 
 import (
-	"db/entity"
+	"github.com/go-nosql/go-nosql/src/db/entity"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strings"

@@ -2,7 +2,7 @@ package supported_db
 
 import (
 	"testing"
-	"abstract"
+	"github.com/go-nosql/go-nosql/src/abstract"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/alyu/configparser"
 	"gopkg.in/mgo.v2"

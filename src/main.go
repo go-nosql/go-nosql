@@ -1,7 +1,7 @@
 package main
 
 import (
-	"db"
+	"github.com/go-nosql/go-nosql/src/db"
 	"fmt"
 )
 
