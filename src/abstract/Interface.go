@@ -2,7 +2,7 @@ package abstract
 
 import "db/entity"
 
-// Database - Interface to define basic DB functions.
+// Database - Interface to define basic DB functionalities.
 type Database interface {
 	Save(interface{}) bool
 	Read() []entity.Map

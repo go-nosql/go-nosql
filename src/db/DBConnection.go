@@ -2,8 +2,8 @@ package db
 
 import (
 	"abstract"
-	"configparser-master"
-	"couch-go-master"
+	"github.com/alyu/configparser"
+	"github.com/peterbourgon/couch-go"
 	"db/entity"
 	"gopkg.in/mgo.v2"
 	"reflect"

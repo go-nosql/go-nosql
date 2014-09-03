@@ -1,7 +1,7 @@
 package supported_db
 
 import (
-	"couch-go-master"
+	"github.com/peterbourgon/couch-go"
 	"db/entity"
 	"fmt"
 	"strconv"
@@ -16,8 +16,11 @@ type CouchDb struct {
 
 // Save - Save generic record in couchDB.
 func (this CouchDb) Save(record interface{}) bool {
+	if record == nil {
+		return false
+	}
 	if reflect.TypeOf(record).String() == "string" {
-		record = entity.Json(record.(string)).ToObject()
+		record = entity.Json(record.(string)).ToObject() //convert Json to Map object
 	}
 	id, rev, err := this.Conn.Insert(record)
 	if err == nil && id != "" && rev != "" {
@@ -38,6 +41,9 @@ func (this CouchDb) Read() []entity.Map {
 
 // Delete - Delete generic record in couchDB.
 func (this CouchDb) Delete(record interface{}) bool {
+	if record == nil {
+		return false
+	}
         if reflect.TypeOf(record).String() == "string" {
                 record = entity.Json(record.(string)).ToObject()
         }
@@ -53,6 +59,9 @@ func (this CouchDb) Delete(record interface{}) bool {
 
 // Update - Update record in couchDB.
 func (this CouchDb) Update(record interface{}) bool {
+	if record == nil {
+		return false
+	}
         if reflect.TypeOf(record).String() == "string" {
                 record = entity.Json(record.(string)).ToObject()
         }
@@ -87,11 +96,7 @@ func (this CouchDb) Last() entity.Map {
 
 // Count - Read number of records from couchDB
 func (this CouchDb) Count() int {
-	ids, err := this.Conn.QueryIds("_all_docs", nil)
-	if err != nil {
-		return -1
-	}
-	return len(ids)
+	return len(getIds(this))
 }
 
 // Limit - Read limited number of records from couchDB.
@@ -128,7 +133,10 @@ func (this CouchDb) Where(query string) []entity.Map {
 	records := this.Read()
 	result := make([]entity.Map, 0)
 	var segs []string = strings.Fields(query)
-	value := segs[2]
+        if len(segs) < 3 {
+                return result
+        }
+        value := strings.Join(segs[2:len(segs)]," ")
         var searchVal interface{}
 	var err error
         if string(value[0]) == "'" && string(value[len(value)-1]) == "'" {

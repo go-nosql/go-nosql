@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 )
 
-// Map - Generic type to handle all schema
+// Map - User defined data type to handle all schema
 type Map map[string]interface{}
+
+//Json - User defined data type to handle json data
 type Json string
 
 // Get - gets the value from the map.
