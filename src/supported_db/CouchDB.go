@@ -183,3 +183,53 @@ func (this CouchDb) Where(query string) []entity.Map {
 	}
 	return result
 }
+
+// Merge - Merge user given record and couchDB record
+func (this CouchDb) Merge(record interface{}) bool {
+        if record == nil {
+                return false
+        }
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+        }
+        dbRecord := make(entity.Map)
+        rev, err := this.Conn.Retrieve(fmt.Sprintf("%s", record.(entity.Map)["_id"]), &dbRecord)
+        recordDirect := removeNesting(map[string]interface{}(record.(entity.Map)),"")
+        for k, v := range recordDirect {
+                if k != "_id" {
+                        dbRecord.Set(k,v)
+                }
+        }
+        if err == nil {
+                rev, err = this.Conn.EditWith(dbRecord, fmt.Sprintf("%s", record.(entity.Map)["_id"]), rev)
+                if err == nil {
+                        return true
+                }
+        } else {
+                panic(err)
+        }
+        return false
+
+
+}
+
+// removeNesting - Remove nested maps to create single level map
+func removeNesting(src map[string]interface{}, chain string) map[string]interface{} {
+        obj := make(map[string]interface{})
+        if chain != "" {
+                chain = chain + "."
+                }
+        for k, v := range src {
+                        switch v.(type) {
+                        case map[string]interface{}:
+                                temp := make(map[string]interface{})
+                                temp = removeNesting(v.(map[string]interface{}), chain+k)
+                                for k1, v1 := range temp {
+                                        obj[k1] = v1
+                                }
+                        default:
+                                obj[chain+k] = v
+                        }
+                }
+        return obj
+}

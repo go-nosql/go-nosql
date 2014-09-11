@@ -107,6 +107,16 @@ func TestCouchFindById(t *testing.T) {
         }
 }
 
+// TestMerge - Test merging user record and couchDB record
+func TestCouchMerge(t *testing.T) {
+        if cdatabase.Count() > 0 {
+                idString := cdatabase.Read()[cdatabase.Count()-1].Get("_id").(string)
+		if cdatabase.Merge(`{"_id":"` + idString + `","address":"Washington","name":"hello world"}`) == false {
+			t.Fatalf("Error when merging user record and couchDB record")
+		}
+        }
+}
+
 // TestDelete - Test deleting a record
 func TestCouchDelete(t *testing.T) {
 	if cdatabase.Delete(cdatabase.Read()[cdatabase.Count()-1]) == false {

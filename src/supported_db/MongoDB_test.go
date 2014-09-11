@@ -109,6 +109,16 @@ func TestMongoFindById(t *testing.T) {
 	}
 }
 
+// TestMerge - Test merging user record and mongoDB record
+func TestMongoMerge(t *testing.T) {
+        if mdatabase.Count() > 0 {
+                idString := mdatabase.Read()[mdatabase.Count()-1].Get("_id").(bson.ObjectId).Hex()
+                if mdatabase.Merge(`{"_id":"` + idString + `","address":"Washington","name":"hello world"}`) == false {
+                        t.Fatalf("Error when merging user record and mongoDB record")
+                }
+        }
+}
+
 // TestDelete - Test deleting a record
 func TestMongoDelete(t *testing.T) {
 	if mdatabase.Delete(mdatabase.Read()[mdatabase.Count()-1]) == false {

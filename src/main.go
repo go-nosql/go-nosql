@@ -64,4 +64,8 @@ func main() {
 	
 	//Delete using json
 	//database.Delete(`{"_id":"53fd78d9b0985415f02f75de"}`)
+
+        //Merge using json
+        database.Merge(`{"_id":"54045b66a4cc0c7a7df045c2","name":"hello"}`)
+        fmt.Println(database.FindById("54045b66a4cc0c7a7df045c2"))
 }

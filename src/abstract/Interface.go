@@ -14,4 +14,5 @@ type Database interface {
 	Limit(int) []entity.Map
 	FindById(string) entity.Map
 	Where(string) []entity.Map
+	Merge(interface{}) bool
 }

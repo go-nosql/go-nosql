@@ -148,3 +148,29 @@ func (this MongoDb) FindById(id string) entity.Map {
         this.Conn.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&record)
         return record
 }
+
+// Merge - Merge user given record and mongoDB record
+func (this MongoDb) Merge(record interface{}) bool {
+        if record == nil {
+                return false
+        }
+        if reflect.TypeOf(record).String() == "string" {
+                record = entity.Json(record.(string)).ToObject()
+                //record.(entity.Map)["_id"] = bson.ObjectIdHex(record.(entity.Map)["_id"].(string))
+        }
+        dbRecord := this.FindById(record.(entity.Map)["_id"].(string))
+        if dbRecord == nil {
+                return false
+        }
+        recordDirect := removeNesting(map[string]interface{}(record.(entity.Map)),"")
+        for k, v := range recordDirect {
+                if k != "_id" {
+                        dbRecord.Set(k,v)
+                }
+        }
+        err := this.Conn.UpdateId(dbRecord["_id"], dbRecord)
+        if err == nil {
+                return true
+        }
+        return false
+}
