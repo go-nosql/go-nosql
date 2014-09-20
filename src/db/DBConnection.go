@@ -25,7 +25,11 @@ func GetConnection(path string) abstract.Database {
 	} else if strings.Contains(strings.ToLower(driver_config.ValueOf("name")), "couch") {
 		db_config, _ = conf.Section("couch")
 		driver_config.SetValueFor("name", "couch")
-	}
+	} else if strings.Contains(strings.ToLower(driver_config.ValueOf("name")), "gtm") {
+                db_config, _ = conf.Section("gtm")
+                driver_config.SetValueFor("name", "gtm")
+        }
+
 	switch strings.ToUpper(driver_config.ValueOf("name")) {
 	case "COUCH":
 		var db couch.Database
@@ -47,6 +51,8 @@ func GetConnection(path string) abstract.Database {
 		db := mongoSession.DB(db_config.ValueOf("dbname"))
 		collection = db.C(db_config.ValueOf("collectionname"))
 		return abstract.Database(supported_db.MongoDb{collection})
+	case "GTM":
+		return abstract.Database(supported_db.GtmDb{Conn:db_config.ValueOf("dbname"),MFilePath:db_config.ValueOf("mfilepath")})
 	default:
 		panic("Supports only Couch or MongoDb")
 	}
